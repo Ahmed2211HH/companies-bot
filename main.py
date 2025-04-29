@@ -4,14 +4,14 @@ from telegram.ext import (
     MessageHandler, filters, ContextTypes
 )
 
-# إعدادات البوت الثاني
-TOKEN = '7871962563:AAH-Lslf0jR5Pr1F0x8fxWvivzDMXMt0Kro'
-CHANNEL_ID_VIP = -1001234567890   # معرف قناة خاص مؤقت
+# إعدادات
+TOKEN = '7871962563:AAH-Lslf0jR5Pr1F0x8fxWvivzDMXMt0Kro'  # توكن البوت الجديد
+CHANNEL_ID_VIP = -1002352256587  # معرف القناة (مؤقتًا، غيرته زي القديم)
 CHANNEL_INVITE_LINK = 'https://t.me/+HZK1cZqHTRhmM2E0'
 STORE_LINK = 'https://options-x.com/Kjeomqy'
-OWNER_ID = 7123756100  # مثل الكود السابق
+OWNER_ID = 7123756100
 
-# قاموس لتخزين المستخدمين
+# قاموس لتخزين المستخدمين الذين ينتظرون الموافقة
 pending_users = {}
 approved_users = {}
 
@@ -29,7 +29,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=reply_markup
     )
 
-# دالة إرسال الإيصال
+# دالة عند الضغط على إرسال إيصال الدفع
 async def send_receipt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -43,7 +43,7 @@ async def send_receipt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text("يرجى إرسال صورة إيصال الدفع هنا للتحقق.")
         context.user_data["awaiting_receipt"] = True
 
-# دالة استقبال الإيصال
+# دالة معالجة الإيصال
 async def check_receipt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if context.user_data.get("awaiting_receipt") and update.message.photo:
         user = update.effective_user
@@ -53,6 +53,7 @@ async def check_receipt(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("طلبك قيد المراجعة بالفعل.")
             return
 
+        # إرسال الإيصال إلى المالك مع أزرار الموافقة أو الرفض
         keyboard = [
             [
                 InlineKeyboardButton("✅ الموافقة على الإضافة", callback_data=f"approve_{user_id}"),
@@ -68,7 +69,7 @@ async def check_receipt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await update.message.reply_text("✅ تم استلام الإيصال بنجاح، سيتم التحقق منه قريباً.")
 
-# دالة الموافقة أو الرفض
+# دالة الموافقة أو الرفض بناءً على الضغط على الأزرار
 async def handle_approval(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -109,7 +110,9 @@ def main():
     application.add_handler(MessageHandler(filters.PHOTO & filters.ChatType.PRIVATE, check_receipt))
     application.add_handler(CallbackQueryHandler(handle_approval, pattern="^(approve_|reject_).*"))
 
-if __name__ == "__main__":
     from keep_alive import keep_alive
     keep_alive()
+    application.run_polling()
+
+if __name__ == "__main__":
     main()

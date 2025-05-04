@@ -5,13 +5,12 @@ from telegram.ext import (
 )
 
 # إعدادات
-TOKEN = '7871962563:AAFpfUxSwktbsCrNklOwQE9Jy5wV11oeJqw'  # توكن البوت الجديد
-CHANNEL_ID_VIP = -1002352256587  # معرف القناة (مؤقتًا، غيرته زي القديم)
+TOKEN = '7871962563:AAFpfUxSwktbsCrNklOwQE9Jy5wV11oeJqw'
+CHANNEL_ID_VIP = -1002352256587
 CHANNEL_INVITE_LINK = 'https://t.me/+HZK1cZqHTRhmM2E0'
 STORE_LINK = 'https://options-x.com/Kjeomqy'
 OWNER_ID = 7123756100
 
-# قاموس لتخزين المستخدمين الذين ينتظرون الموافقة
 pending_users = {}
 approved_users = {}
 
@@ -20,7 +19,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     keyboard = [
         [InlineKeyboardButton("زيارة المتجر", url=STORE_LINK)],
-        [InlineKeyboardButton("إرسال إيصال الدفع", callback_data="send_receipt")]
+        [InlineKeyboardButton("إرسال إيصال الدفع", callback_data="send_receipt")],
+        [InlineKeyboardButton("الدعم الفني", url="https://t.me/OptionXn")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(
@@ -33,8 +33,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def send_receipt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-
     user_id = update.effective_user.id
+
     if user_id in approved_users:
         await query.edit_message_text("تمت إضافتك بالفعل إلى القناة الخاصة!")
     elif user_id in pending_users:
@@ -53,38 +53,32 @@ async def check_receipt(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("طلبك قيد المراجعة بالفعل.")
             return
 
-        # إرسال الإيصال إلى المالك مع أزرار الموافقة أو الرفض
-        keyboard = [
-            [
-                InlineKeyboardButton("✅ الموافقة على الإضافة", callback_data=f"approve_{user_id}"),
-                InlineKeyboardButton("❌ رفض الإضافة", callback_data=f"reject_{user_id}")
-            ]
-        ]
+        keyboard = [[
+            InlineKeyboardButton("✅ الموافقة على الإضافة", callback_data=f"approve_{user_id}"),
+            InlineKeyboardButton("❌ رفض الإضافة", callback_data=f"reject_{user_id}")
+        ]]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
-        await context.bot.send_photo(chat_id=OWNER_ID, photo=update.message.photo[-1].file_id, caption=f"📥 إيصال من {user.first_name} (ID: {user_id})", reply_markup=reply_markup)
+        await context.bot.send_photo(chat_id=OWNER_ID, photo=update.message.photo[-1].file_id,
+                                     caption=f"📥 إيصال من {user.first_name} (ID: {user_id})", reply_markup=reply_markup)
 
         pending_users[user_id] = user
         context.user_data["awaiting_receipt"] = False
-
         await update.message.reply_text("✅ تم استلام الإيصال بنجاح، سيتم التحقق منه قريباً.")
 
-# دالة الموافقة أو الرفض بناءً على الضغط على الأزرار
+# دالة الموافقة أو الرفض
 async def handle_approval(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-
     data = query.data
+
     if data.startswith("approve_"):
         user_id = int(data.split("_")[1])
-
         if user_id in pending_users:
             user = pending_users.pop(user_id)
             try:
-                await context.bot.send_message(
-                    chat_id=user_id,
-                    text=f"🎉 تم التحقق من إيصالك! يمكنك الآن الانضمام إلى القناة الخاصة:\n{CHANNEL_INVITE_LINK}"
-                )
+                await context.bot.send_message(chat_id=user_id,
+                    text=f"🎉 تم التحقق من إيصالك! يمكنك الآن الانضمام إلى القناة الخاصة:\n{CHANNEL_INVITE_LINK}")
                 await query.edit_message_caption(caption="✅ تم الموافقة على الإضافة وإرسال الدعوة.", reply_markup=None)
                 approved_users[user_id] = user
             except Exception as e:
@@ -94,7 +88,6 @@ async def handle_approval(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data.startswith("reject_"):
         user_id = int(data.split("_")[1])
-
         if user_id in pending_users:
             pending_users.pop(user_id)
             await query.edit_message_caption(caption="❌ تم رفض الإضافة.", reply_markup=None)

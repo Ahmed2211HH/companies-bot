@@ -5,9 +5,9 @@ from telegram.ext import (
 )
 
 # إعدادات
-TOKEN = '7871962563:AAFpfUxSwktbsCrNklOwQE9Jy5wV11oeJqw'
+TOKEN = '7871962563:AAF7TDsAyhMcfCtu6hMHgIcfwC7SPIocl5s'
 CHANNEL_ID_VIP = -1002352256587
-CHANNEL_INVITE_LINK = 'https://t.me/+HZK1cZqHTRhmM2E0'
+CHANNEL_INVITE_LINK = 'https://t.me/+pw4RoSY-6e8wMjY0'
 STORE_LINK = 'https://options-x.com/Kjeomqy'
 OWNER_ID = 7123756100
 

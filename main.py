@@ -7,8 +7,8 @@ from telegram.ext import (
 # إعدادات
 TOKEN = '8427790232:AAHc_D6Bs7iXtLVeC7S_ya92KLJwUxI8YZ4'
 CHANNEL_ID_VIP = -1002653227232
-CHANNEL_INVITE_LINK = 'https://t.me/+pw4RoSY-6e8wMjY0'
-STORE_LINK = 'https://options-x.com/Kjeomqy'
+CHANNEL_INVITE_LINK = 'https://t.me/+CXzvju1cZLU0ZTE8'
+STORE_LINK = 'https://options-x.com/باقة-قناة-سباكس-لمدة-أربع-أسابيع/p1136204150'
 OWNER_ID = 7123756100
 
 pending_users = {}
